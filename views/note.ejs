@@ -1,0 +1,89 @@
+<%- include('header') -%>
+
+<div class="jumbotron my-auto d-flex align-items-center justify-content-center">
+<form class="row g-3 needs-validation" action="/note" method="POST" novalidate>
+  <div class="col-md-4 dateContainer">
+    <label for="date" class="form-label text-light">Date & Time</label>
+    <input type="datetime-local" class="form-control" id="date" placeholder="DD/MM/YYYY HH:MM" name="date" required>
+    <div class="valid-feedback">
+      Looks good!
+    </div>
+  </div>
+  <div class="col-md-4">
+    <label for="appearance" class="form-label text-light">Appearance</label>
+    <input type="text" class="form-control" id="appearance" placeholder="Appearance" name="appearance" required>
+    <div class="valid-feedback">
+      Looks good!
+    </div>
+  </div>
+  <div class="col-md-4">
+    <label for="behaviour" class="form-label text-light">Behaviour</label>
+    <div class="input-group has-validation">
+      <input type="text" class="form-control" id="behaviour" aria-describedby="inputGroupPrepend" name="behaviour" placeholder="Behaviour" required>
+      <div class="invalid-feedback">
+        Please input valid data.
+      </div>
+    </div>
+  </div>
+  <div class="col-md-6">
+    <label for="vocalisations" class="form-label text-light">Vocalisations</label>
+    <input type="text" class="form-control" id="vocalisations" name="vocalisations" placeholder="Vocalisations" required>
+    <div class="invalid-feedback">
+      Please input valid data.
+    </div>
+  </div>
+  <div class="col-md-3">
+    <label for="habitat" class="form-label text-light">Habitat</label>
+    <select class="form-select" id="habitat" name="habitat" required>
+      <option selected disabled value="">Choose...</option>
+      <% habitatsResults.forEach((habitat) =>{ %>
+      <option><%= habitat.name %></option>
+     <% }); %>
+    </select>
+    <div class="invalid-feedback">
+      Please select a valid habitat.
+    </div>
+  </div>
+  <div class="col-md-3">
+    <label for="flock_size" class="form-label text-light">Flock Size</label>
+    <input type="number" class="form-control" id="flock_size" name="flock_size" required>
+    <div class="invalid-feedback">
+      Please input valid data.
+    </div>
+  </div>
+ 
+  <div class="col-12">
+    <button class="btn btn-dark" type="submit">Submit form</button>
+  </div>
+</form>
+  </div>
+
+  <script>// Example starter JavaScript for disabling form submissions if there are invalid fields
+(function () {
+  'use strict'
+
+  // Fetch all the forms we want to apply custom Bootstrap validation styles to
+  var forms = document.querySelectorAll('.needs-validation')
+
+  // Loop over them and prevent submission
+  Array.prototype.slice.call(forms)
+    .forEach(function (form) {
+      form.addEventListener('submit', function (event) {
+        if (!form.checkValidity()) {
+          event.preventDefault()
+          event.stopPropagation()
+        }
+
+        form.classList.add('was-validated')
+      }, false)
+    })
+})()</script>
+
+<script>
+var dateTime = document.getElementById("date").value;
+var today = new Date().toISOString().split('T')[0];
+document.getElementById("dateTime").setAttribute('max', today);
+</script>
+
+
+<%- include('footer') -%>

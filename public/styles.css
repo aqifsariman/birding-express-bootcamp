@@ -1,0 +1,47 @@
+body,
+html {
+  height: 100%;
+}
+
+.bg {
+  /* The image used */
+  background-image: url('https://i.pinimg.com/originals/33/fe/8d/33fe8d7568ac9c3ba212774036169a19.jpg');
+
+  /* Full height */
+  height: 100%;
+
+  /* Center and scale the image nicely */
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
+img {
+  width: 70px;
+  height: auto;
+  background: transparent;
+  padding-left: 3px;
+}
+
+.jumbotron {
+  background-color: rgba(128, 128, 128, 0.433);
+  height: 100vh;
+}
+
+a {
+  text-decoration: none;
+  color: black;
+}
+
+.button {
+  width: 100px;
+  height: 30px;
+}
+
+.navbar-nav .nav-link {
+  padding-left: 30px;
+}
+
+.dropdown-item {
+  padding-left: 5px;
+}

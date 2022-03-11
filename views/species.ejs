@@ -1,0 +1,62 @@
+<%- include('header') -%>
+
+<div class="jumbotron my-auto d-flex align-items-center justify-content-center">
+<form class="row g-3 needs-validation" action="/species" method="POST" novalidate>
+
+  <div class="row">
+    <label for="species" class="form-label text-light">Species Name</label>
+    <div class="input-group has-validation">
+    <input type="text" class="form-control" id="species" aria-describedby="inputGroupPrepend" placeholder="Species Name" name="species" required>
+    <div class="invalid-feedback">
+      Input cannot be empty.
+    </div>
+  </div>
+  </div>
+  <div class="row">
+    <label for="scientific" class="form-label text-light">Scientific Name</label>
+    <div class="input-group has-validation">
+      <input type="text" class="form-control" id="scientific" aria-describedby="inputGroupPrepend" name="scientific" placeholder="Scientific Name" required>
+      <div class="invalid-feedback">
+        Input cannot be empty.
+      </div>
+      </div>
+    </div>
+     
+  <div class="col-12">
+    <button class="btn btn-dark" type="submit">Submit form</button>
+  </div>
+  </div>
+ 
+
+</form>
+  </div>
+
+  <script>// Example starter JavaScript for disabling form submissions if there are invalid fields
+(function () {
+  'use strict'
+
+  // Fetch all the forms we want to apply custom Bootstrap validation styles to
+  var forms = document.querySelectorAll('.needs-validation')
+
+  // Loop over them and prevent submission
+  Array.prototype.slice.call(forms)
+    .forEach(function (form) {
+      form.addEventListener('submit', function (event) {
+        if (!form.checkValidity()) {
+          event.preventDefault()
+          event.stopPropagation()
+        }
+
+        form.classList.add('was-validated')
+      }, false)
+    })
+})()</script>
+
+<script>
+var dateTime = document.getElementById("date").value;
+var today = new Date().toISOString().split('T')[0];
+document.getElementById("dateTime").setAttribute('max', today);
+</script>
+
+
+<%- include('footer') -%>

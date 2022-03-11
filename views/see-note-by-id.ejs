@@ -1,0 +1,77 @@
+<%- include('header') -%>
+<div class="jumbotron my-auto d-flex align-items-center justify-content-center">
+<div class="container text-light">
+  <div class="row">
+    <div class="col">
+      Date
+    </div>
+    <div class="col-11">
+    <%=finalResults.date%>
+    </div>
+  </div>
+  <div class="row mt-5">
+    <div class="col">
+      Habitat
+    </div>
+    <div class="col-11">
+      <%=finalResults.habitat%>
+    </div>
+  </div>
+  <div class="row mt-5">
+    <div class="col">
+      Appearance
+    </div>
+    <div class="col-11">
+          <%=finalResults.appearance%>
+    </div>
+  </div>
+  <div class="row mt-5">
+    <div class="col">
+      Behaviour
+    </div>
+    <div class="col-11">
+        <%=finalResults.behaviour%>
+    </div>
+  </div>
+  <div class="row mt-5">
+    <div class="col">
+      Vocalisations
+    </div>
+    <div class="col-11">
+         <%=finalResults.vocalisations%>
+    </div>
+  </div>
+  <div class="row mt-5">
+    <div class="col">
+      Flock Size
+    </div>
+    <div class="col-11">
+          <%=finalResults.flock_size%>
+    </div>
+  </div>
+
+  
+  <div><button type="button" class="btn btn-light btn-outline-dark mt-5" id="edit"><a class="text-dark" href='/note/<%=id%>/edit' id="edit" >Edit Report</a></button>
+    <script>
+       const checkCookie = () => { 
+         const retrieveUsername = document.cookie.split('; ').find(row => row.startsWith('username=')).split('=')[1]
+         const retrieveSubmission = document.cookie.split('; ').find(row => row.startsWith('submittedByCookie=')).split('=')[1]
+     console.log(retrieveUsername)
+     console.log(retrieveSubmission)
+
+   if (retrieveUsername !== retrieveSubmission) { 
+     event.preventDefault();
+    alert('Only the owner of this note can edit!'); 
+    return false;
+   }
+ } 
+
+ document.getElementById("edit").addEventListener('click', checkCookie)
+    </script>
+</div>
+</div>
+
+</div>
+</div>
+
+<%- include('footer') -%>

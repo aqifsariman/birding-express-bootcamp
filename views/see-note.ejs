@@ -1,0 +1,48 @@
+<%- include('header') -%>
+<div class="jumbotron my-auto d-flex flex-column flex-sm-wrap align-items-center justify-content-center" style="height:100vh; width:100vw">
+    <table class="table table-striped table-light mt-5 table-hover col-sm-4" style="width:50vw">
+      
+      <thead>
+        <div>
+          <th scope="col" colspan="12" class="text-center text-light bg-transparent"><h1>Bird Sightings List</h1></th>
+        </div>
+        <tr class="text-dark">
+          <th scope="col">Date</th>
+          <th scope="col">Habitat</th>
+          <th scope="col">Appearance</th>
+          <th scope="col">Behaviour</th>
+          <th scope="col">Vocalisations</th>
+          <th scope="col">Flock Size</th>
+          <th scope="col">Noted By</th>
+        </tr>
+      </thead>
+      <tbody>
+         <tr class="d-flex flex-sm-wrap"></tr>
+        <% for (let i =0; i< finalResults.length;i++) {%>
+          <td class="col text-dark" ><a href="/note/<%=finalResults[i].id%>"><%=finalResults[i].date %></a></td>
+          <td class="col text-dark" ><a href="/note/<%=finalResults[i].id%>"><%=finalResults[i].habitat %></a></td>
+          <td class="col text-dark" ><a href="/note/<%=finalResults[i].id%>"><%=finalResults[i].appearance %></a></td>
+          <td class="col text-dark" ><a href="/note/<%=finalResults[i].id%>"><%=finalResults[i].behaviour %></a></td>
+          <td class="col text-dark" ><a href="/note/<%=finalResults[i].id%>"><%=finalResults[i].vocalisations %></a></td>
+          <td class="col text-dark" ><a href="/note/<%=finalResults[i].id%>"><%=finalResults[i].flock_size %></a></td>
+          <td class="col text-dark" ><%=finalResults[i].submitted_by %></td>
+          </tr>
+        <% } %>
+      </tbody>
+    </table>
+     <div class="dropdown">
+  <button class="btn btn-light dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+    Sort By
+  </button>
+  <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+    <a class="dropdown-item" href="/getallnotes?sort=date">Date</a>
+    <a class="dropdown-item" href="/getallnotes?sort=habitat">Habitat</a>
+    <a class="dropdown-item" href="/getallnotes?sort=flock_size">Flock Size</a>
+    <a class="dropdown-item" href="/getallnotes?sort=user_submitted">User Submitted</a>
+  </div>
+</div>
+  </div>
+  
+
+
+<%- include('footer') -%>

@@ -1,0 +1,44 @@
+<%- include('header') -%>
+<div class="jumbotron my-auto d-flex align-items-center justify-content-center">
+<div class="container text-light">
+  <div class="row">
+    <div class="col">
+      Species Name
+    </div>
+    <div class="col-11">
+    <%=finalResults.name%>
+    </div>
+  </div>
+  <div class="row mt-5">
+    <div class="col">
+      Scientific Name
+    </div>
+    <div class="col-11">
+      <%=finalResults.scientific_name%>
+    </div>
+  </div>
+  
+  <div><button type="button" class="btn btn-light btn-outline-dark mt-5" id="edit"><a class="text-dark" href='/species/<%=id%>/edit' id="edit" >Edit Note</a></button>
+    <script>
+       const checkCookie = () => { 
+         const retrieveUsername = document.cookie.split('; ').find(row => row.startsWith('username=')).split('=')[1]
+         const retrieveSubmission = document.cookie.split('; ').find(row => row.startsWith('submittedByCookie=')).split('=')[1]
+     console.log(retrieveUsername)
+     console.log(retrieveSubmission)
+
+   if (retrieveUsername !== retrieveSubmission) { 
+     event.preventDefault();
+    alert('Only the owner of this note can edit!'); 
+    return false;
+   }
+ } 
+
+ document.getElementById("edit").addEventListener('click', checkCookie)
+    </script>
+</div>
+</div>
+
+</div>
+</div>
+
+<%- include('footer') -%>

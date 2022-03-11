@@ -1,0 +1,25 @@
+<%- include('header') -%>
+
+<div class="jumbotron my-auto d-flex flex-column align-items-center justify-content-center" style="height:94vh; width:100vw">
+<div class=" alert alert-success alert-dismissible fade show" id="alert" role="alert">
+  <strong>Login Successfully.</strong> Welcome!
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+</div>
+<script>
+  const retrieveVisits = document.cookie.split('; ').find(row => row.startsWith('visits=')).split('=')[1];
+  console.log(retrieveVisits)
+
+  if (retrieveVisits > 1) { 
+    document.getElementById("alert").classList.add('d-none')
+  } 
+
+</script>
+
+  <h1 class="display-4 text-light text-center">Hello There<br>Bird Watchers</h1>
+  <div class="container d-flex justify-content-center mt-5">
+
+  </div>
+
+</div>
+
+<%- include('footer') -%>
