@@ -1,0 +1,43 @@
+<%- include('header') -%>
+
+<div class="jumbotron my-auto d-flex align-items-center justify-content-center">
+ <form class="mt-5" action="/note/<%=id%>/comments/edit?_method=PUT" method="POST">
+  <div class="form-row">
+    <label for="comments" class="text-light mb-3">Comments:</label>  
+    <div class="form-group text-light">
+    <textarea name="comments" id="comments" cols="50" rows="10" ><%=finalResults.notes_comments%></textarea>
+  </div>
+ 
+
+   <div class="mt-5 d-flex justify-content-center">
+      <form
+        action="/note/<%=id%>/comments/edit?_method=PUT"
+        method="POST"
+      >
+        <input
+          type="submit"
+          value="Edit"
+          class="button mx-3"
+          id="edit"
+          onclick="return confirm('Are you sure you want to edit this comment?');"
+        />
+      </form>
+      <form
+        action="/note/<%=id%>/comments/delete?_method=DELETE"
+        method="POST"
+      >
+        <input
+          type="submit"
+          value="Delete"
+          class="button mx-3"
+          onclick="return confirm('Are you sure you want to delete this comment?');"
+        />
+      </form>
+    </div>
+  </div>
+  </div>
+</form>
+  </div>
+
+
+<%- include('footer') -%>

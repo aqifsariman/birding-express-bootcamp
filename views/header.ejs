@@ -1,21 +1,35 @@
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+<body>
+  
+</body>
+</html>
+
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
   <link rel="stylesheet" href="/styles.css">
-  <title>BIRD HUNTING</title>
+  <title>Bird Watching</title>
 </head>
 <body>
 <nav class="navbar navbar-expand-lg navbar-light bg-light">
-  <a class="navbar-brand" href="/"><img src="https://www.clipartmax.com/png/middle/207-2075233_owl-always-miss-you-owls-logo-designs.png" alt=""> Bird Hunting</a>
+  <a class="navbar-brand" href="/"><img src="https://www.clipartmax.com/png/middle/207-2075233_owl-always-miss-you-owls-logo-designs.png"> Bird Watching</a>
   <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
     <span class="navbar-toggler-icon ml-5"></span>
   </button>
 
   <div class="collapse navbar-collapse justify-content-end" id="navbarSupportedContent">
-    <ul class="navbar-nav pl-5">
+    <ul class="navbar-nav mx-5">
       <li class="nav-item active">
         <li class="nav-item">
         <a class="nav-link" href="/note">Add Notes</a>
@@ -28,9 +42,16 @@
       <li class="nav-item">
         <a class="nav-link" href="/species/all"> Species</a>
       </li>
+      <li class="nav-item">
+        <a class="nav-link" href="/behaviours"> Behaviours</a>
+      </li>
       <li class="nav-item dropdown">
+                 <% function capitalizeFirstLetter(str) { %>
+            <% const capitalized = str.charAt(0).toUpperCase() + str.slice(1);%>
+                <%return capitalized;%>
+          <%}%>
         <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-          Account
+          <%=capitalizeFirstLetter(username)%>
         </a>
         <div class="dropdown-menu" aria-labelledby="navbarDropdown">
           <a class="dropdown-item" href="/user/<%=username%>">User Notes</a>

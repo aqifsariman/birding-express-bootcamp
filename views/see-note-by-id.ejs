@@ -68,6 +68,10 @@
 
  document.getElementById("edit").addEventListener('click', checkCookie)
     </script>
+    <% if(commentExist !== false){ %>
+   <button type="button" class="btn btn-light btn-outline-dark mt-5" id="comments"><a class="text-dark" href='/note/<%=id%>/comments-all' id="comments" >See Comments</a></button>
+    <%  } %>
+     <button type="button" class="btn btn-light btn-outline-dark mt-5" id="editComments"><a class="text-dark" href='/note/<%=id%>/comments' id="comments" >Add Comments</a></button>
 </div>
 </div>
 

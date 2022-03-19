@@ -1,3 +1,4 @@
+/* eslint-disable new-cap */
 /* eslint-disable camelcase */
 /* eslint-disable no-underscore-dangle */
 // importing necessary npm modules
@@ -6,6 +7,7 @@ import express from 'express';
 import methodOverride from 'method-override';
 import cookieParser from 'cookie-parser';
 import moment from 'moment';
+import jsSHA from 'jssha';
 
 const app = express();
 
@@ -19,6 +21,8 @@ app.use(methodOverride('_method'));
 
 const { Pool } = pg;
 const port = 3004;
+const SALT = 'hedwig';
+let commentExist;
 
 // set the way we will connect to the server
 const pgConnectionConfigs = {
@@ -40,11 +44,15 @@ const signUp = (req, res) => {
 
 const postSignUp = (req, res) => {
   const input = req.body;
-  const insertQuery = `INSERT INTO username (username, password) VALUES ('${input.username}', '${input.password}')`;
+  const insertQuery = 'INSERT INTO username (username, password) VALUES ($1, $2)';
   if (input === null || input === undefined) {
     res.render('signup');
   }
-  pool.query(insertQuery, () => {
+  const shaObj = new jsSHA('SHA-512', 'TEXT', { encoding: 'UTF8' });
+  shaObj.update(input.password);
+  const hashedPassword = shaObj.getHash('HEX');
+  const values = [input.username, hashedPassword];
+  pool.query(insertQuery, values, () => {
     const showQuery = 'SELECT * FROM username';
     pool.query(showQuery, (error, result) => {
       console.log(result.rows);
@@ -59,11 +67,11 @@ const loginPage = (req, res) => {
 
 const loginDetails = (req, res) => {
   const values = [req.body.username];
-
-  pool.query('SELECT * from username WHERE username=$1', values, (error, result) => {
+  const loginQuery = 'SELECT * FROM username WHERE username=$1';
+  pool.query(loginQuery, values, (error, result) => {
     if (error) {
       console.log('Error executing query', error.stack);
-      res.status(503).send(result.rows);
+      res.status(503).send(result.rows[0]);
       return;
     }
 
@@ -75,10 +83,18 @@ const loginDetails = (req, res) => {
     }
 
     const user = result.rows[0];
+    const shaObj = new jsSHA('SHA-512', 'TEXT', { encoding: 'UTF8' });
+    shaObj.update(req.body.password);
+    const hashedPassword = shaObj.getHash('HEX');
 
-    if (user.password === req.body.password) {
+    if (user.password === hashedPassword) {
+      const shaObj2 = new jsSHA('SHA-512', 'TEXT', { encoding: 'UTF8' });
+
+      const unhashedCookieString = `${user.username}-${SALT}`;
+      shaObj2.update(unhashedCookieString);
+      const hashedCookieString = shaObj2.getHash('HEX');
+      res.cookie('loggedInHash', hashedCookieString);
       res.cookie('username', req.body.username);
-      res.cookie('loggedIn', true);
       res.cookie('visits', visit);
       res.redirect(301, '/');
       console.log('Login success!');
@@ -97,16 +113,19 @@ const logout = (req, res) => {
 };
 
 const homePage = (req, res) => {
-  if (req.cookies.loggedIn === undefined) {
-    res.status(403);
+  const { loggedInHash, username } = req.cookies;
+  const shaObj = new jsSHA('SHA-512', 'TEXT', { encoding: 'UTF8' });
+  // reconstruct the hashed cookie string
+  const unhashedCookieString = `${username}-${SALT}`;
+  shaObj.update(unhashedCookieString);
+  const hashedCookieString = shaObj.getHash('HEX');
+  if (hashedCookieString !== loggedInHash) {
     console.log('Please log in!');
     res.redirect(301, '/login');
-  } else if (req.cookies.loggedIn === 'true') {
-    visit += 1;
-    res.cookie('visits', visit);
-    const { username } = req.cookies;
-    res.render('home', { username });
   }
+  visit += 1;
+  res.cookie('visits', visit);
+  res.render('home', { username });
 };
 
 const getAllNotes = (req, res) => {
@@ -135,6 +154,12 @@ const getAllNotes = (req, res) => {
         finalResults = results.rows;
         res.render('see-note', { finalResults, username });
       });
+    } else if (sort === 'behaviour') {
+      sortQuery = 'SELECT id, habitat, date, appearance, behaviour, vocalisations, flock_size, submitted_by FROM bird_hunting ORDER BY behaviour ASC';
+      pool.query(sortQuery, (error, results) => {
+        finalResults = results.rows;
+        res.render('see-note', { finalResults, username });
+      });
     } else if (sort === 'flock_size') {
       sortQuery = 'SELECT id, habitat, date, appearance, behaviour, vocalisations, flock_size, submitted_by FROM bird_hunting ORDER BY flock_size ASC';
       pool.query(sortQuery, (error, results) => {
@@ -157,14 +182,22 @@ const getAllNotes = (req, res) => {
 const getNotesForm = (req, res) => {
   const { username } = req.cookies;
   const habitatsQuery = 'SELECT * FROM habitats';
+  const behaviourQuery = 'SELECT * FROM behaviours';
   pool.query(habitatsQuery, (habitatsQueryError, habitatsQueryResult) => {
     if (habitatsQueryError) {
       console.log('Error executing query', habitatsQueryError.stack);
       res.status(503).send(habitatsQueryResult.rows);
       return;
     }
-    const habitatsResults = habitatsQueryResult.rows;
-    res.render('note', { username, habitatsResults });
+    pool.query(behaviourQuery, (behaviourQueryError, behaviourQueryResult) => {
+      if (behaviourQueryError) {
+        console.log('Error executing query', behaviourQueryError.stack);
+        res.status(503).send(behaviourQueryResult.rows);
+      }
+      const behaviourResults = behaviourQueryResult.rows;
+      const habitatsResults = habitatsQueryResult.rows;
+      res.render('note', { username, habitatsResults, behaviourResults });
+    });
   });
 };
 
@@ -173,13 +206,14 @@ const postIntoNotes = (req, res) => {
 
   const input = req.body;
   const { date } = req.body;
+  console.log(input.behaviour);
   const m = moment(date, moment.HTML5_FMT.DATETIME_LOCAL, ['YYYY-MM-DDTHH:mm']).format(
     'dddd [,] MMMM Do YYYY',
   );
 
   const allNotesQuery = 'SELECT max(id) FROM bird_hunting';
 
-  const notesQuery = `INSERT INTO bird_hunting (habitat, date, appearance, behaviour, vocalisations, flock_size, submitted_by) VALUES ('${input.habitat}', '${m}', '${input.appearance}', '${input.behaviour}', '${input.vocalisations}', ${input.flock_size}, '${username}')`;
+  const notesQuery = `INSERT INTO bird_hunting (habitat, date, appearance, behaviour, vocalisations, flock_size, submitted_by) VALUES ('${input.habitat}', '${m}', '${input.appearance}', '${input.behaviour}', '${input.vocalisations}', ${input.flock_size}, '${username}') RETURNING id`;
 
   pool.query(notesQuery, (notesQueryError, notesQueryResult) => {
     if (notesQueryError) {
@@ -189,9 +223,9 @@ const postIntoNotes = (req, res) => {
     }
 
     pool.query(allNotesQuery, (allNotesQueryError, allNotesQueryResult) => {
-      const index = allNotesQueryResult.rows[0].max;
+      const id = allNotesQueryResult.rows[0].max;
 
-      res.redirect(301, `/note/${index}`);
+      res.redirect(301, `/note/${id}`);
     });
   });
 };
@@ -201,6 +235,7 @@ const getNotesById = (req, res) => {
   const { id } = req.params;
   const idQuery = `SELECT * FROM bird_hunting WHERE id=${id}`;
   const submissionQuery = `SELECT submitted_by FROM bird_hunting WHERE id=${id}`;
+  const commentsQuery = `SELECT * FROM comments WHERE notes_id = ${id}`;
   pool.query(idQuery, (idQueryError, idQueryResult) => {
     if (idQueryError) {
       console.log('Error executing query', idQueryError.stack);
@@ -208,12 +243,33 @@ const getNotesById = (req, res) => {
       return;
     }
     pool.query(submissionQuery, (error, result) => {
-      res.cookie('submittedByCookie', result.rows[0].submitted_by);
-      const finalResults = idQueryResult.rows[0];
-      res.render('see-note-by-id', {
-        finalResults,
-        id,
-        username,
+      pool.query(commentsQuery, (commentsQueryErr, commentsQueryRes) => {
+        if (commentsQueryRes.rows.length === 0) {
+          commentExist = false;
+          console.log(commentExist);
+          res.cookie('submittedByCookie', result.rows[0].submitted_by);
+          const finalResults = idQueryResult.rows[0];
+          res.render('see-note-by-id', {
+            finalResults,
+            id,
+            username,
+            commentExist,
+          });
+
+          return;
+        }
+        commentExist = true;
+        console.log(commentExist);
+        const commentsResult = commentsQueryRes.rows;
+        res.cookie('submittedByCookie', result.rows[0].submitted_by);
+        const finalResults = idQueryResult.rows[0];
+        res.render('see-note-by-id', {
+          finalResults,
+          id,
+          username,
+          commentExist,
+          commentsResult,
+        });
       });
     });
   });
@@ -281,11 +337,52 @@ const deleteNotes = (req, res) => {
 };
 
 const userNotes = (req, res) => {
+  let finalResults;
   const { username } = req.cookies;
+  let sortQuery = 'default';
+  const { sort } = req.query;
+  const commentQuery = `SELECT notes_comments, appearance, notes_id, comments.id FROM bird_hunting INNER JOIN comments ON notes_id = bird_hunting.id WHERE username= '${username}'`;
   const userQuery = `SELECT * FROM bird_hunting WHERE submitted_by='${username}'`;
   pool.query(userQuery, (error, result) => {
-    const finalResults = result.rows;
-    res.render('user', { finalResults, username });
+    pool.query(commentQuery, (err, commentsResult) => {
+      const comments = commentsResult.rows;
+
+      if (sort === 'date') {
+        sortQuery = "SELECT id, habitat, date, appearance, behaviour, vocalisations, flock_size, submitted_by FROM bird_hunting ORDER BY to_date(date, 'Day [,] Month DDth YYYY') ASC;";
+        pool.query(sortQuery, (err, results) => {
+          finalResults = results.rows;
+          res.render('user', { finalResults, username, comments });
+        });
+      } else if (sort === 'habitat') {
+        sortQuery = 'SELECT id, habitat, date, appearance, behaviour, vocalisations, flock_size, submitted_by FROM bird_hunting ORDER BY habitat ASC';
+        pool.query(sortQuery, (err, results) => {
+          finalResults = results.rows;
+          res.render('user', { finalResults, username, comments });
+        });
+      } else if (sort === 'behaviour') {
+        sortQuery = 'SELECT id, habitat, date, appearance, behaviour, vocalisations, flock_size, submitted_by FROM bird_hunting ORDER BY behaviour ASC';
+        pool.query(sortQuery, (err, results) => {
+          finalResults = results.rows;
+          res.render('user', { finalResults, username, comments });
+        });
+      } else if (sort === 'flock_size') {
+        sortQuery = 'SELECT id, habitat, date, appearance, behaviour, vocalisations, flock_size, submitted_by FROM bird_hunting ORDER BY flock_size ASC';
+        pool.query(sortQuery, (err, results) => {
+          finalResults = results.rows;
+          res.render('user', { finalResults, username, comments });
+        });
+      } else if (sort === 'user_submitted') {
+        sortQuery = 'SELECT id, habitat, date, appearance, behaviour, vocalisations, flock_size, submitted_by FROM bird_hunting ORDER BY submitted_by ASC';
+        pool.query(sortQuery, (err, results) => {
+          finalResults = results.rows;
+          res.render('user', { finalResults, username, comments });
+        });
+      } else {
+        console.log(comments);
+        finalResults = result.rows;
+        res.render('user', { finalResults, username, comments });
+      }
+    });
   });
 };
 
@@ -358,7 +455,7 @@ const editSpecies = (req, res) => {
 
 const editSpeciesPut = (req, res) => {
   const { id } = req.params;
-  const { username } = req.cookie;
+  const { username } = req.cookies;
   const { name, scientific_name } = req.body;
   const updateQuery = 'UPDATE bird_hunting SET name = $1, scientific_name = $2 WHERE id= $3';
   const idQuery = `SELECT * FROM species WHERE id= ${id}`;
@@ -391,6 +488,115 @@ const deleteSpecies = (req, res) => {
   });
 };
 
+const getBehaviours = (req, res) => {
+  const { username } = req.cookies;
+  const behaviourQuery = 'SELECT * FROM behaviours';
+
+  let sortQuery = 'default';
+  const { sort } = req.query;
+  let finalResults;
+  pool.query(behaviourQuery, (behaviourQueryError, behaviourQueryResult) => {
+    if (behaviourQueryError) {
+      console.log('Error executing query', behaviourQueryError);
+    }
+    if (sort === 'behaviour') {
+      sortQuery = 'SELECT name FROM behaviours ORDER BY name ASC';
+      pool.query(sortQuery, (error, results) => {
+        finalResults = results.rows;
+        res.render('behaviours', { finalResults, username });
+      });
+    } else {
+      finalResults = behaviourQueryResult.rows;
+      res.render('behaviours', { username, finalResults });
+    }
+  });
+};
+
+const getBehavioursByID = (req, res) => {
+  const { username } = req.cookies;
+  const { behaviour } = req.params;
+
+  const notesquery = 'SELECT * FROM bird_hunting';
+  pool.query(notesquery, (notesQueryError, notesQueryResult) => {
+    if (notesQueryError) {
+      console.log('Error executing error', notesQueryError);
+    }
+    const finalResults = [];
+    notesQueryResult.rows.forEach((final) => {
+      if (final.behaviour.includes(behaviour) === true) {
+        finalResults.push(final);
+      }
+    });
+    res.render('notes-by-behaviour', { username, finalResults });
+  });
+};
+
+const commentsForm = (req, res) => {
+  const { username } = req.cookies;
+  const { id } = req.params;
+  res.render('commentsForm', { username, id });
+};
+
+const postComments = (req, res) => {
+  const { username } = req.cookies;
+  const { id } = req.params;
+  const comments = req.body;
+  const commentQuery = 'INSERT INTO comments (username, notes_comments, notes_id) VALUES ($1, $2, $3)';
+  const values = [username, comments.comments, id];
+  pool.query(commentQuery, values, (err) => {
+    if (err) {
+      commentExist = false;
+      res.redirect(301, '/note');
+    }
+    commentExist = true;
+    res.redirect(301, `/note/${id}`);
+  });
+};
+
+const getComments = (req, res) => {
+  const { username } = req.cookies;
+  const { id } = req.params;
+  const commentsQuery = `SELECT * FROM comments WHERE notes_id=${id}`;
+  pool.query(commentsQuery, (err, result) => {
+    const finalResults = result.rows;
+    res.render('commentsPage', { id, username, finalResults });
+  });
+};
+
+const editComment = (req, res) => {
+  const { username } = req.cookies;
+  const { id } = req.params;
+  const commentsQuery = `SELECT * FROM comments WHERE id= ${id}`;
+  pool.query(commentsQuery, (err, result) => {
+    const finalResults = result.rows[0];
+    console.log(finalResults);
+    res.render('edit-comment', { username, id, finalResults });
+  });
+};
+
+const editcommentPut = (req, res) => {
+  const { id } = req.params;
+  const { comments } = req.body;
+  const commentQuery = `UPDATE comments SET notes_comments = '${comments}' WHERE id=${id} RETURNING notes_id`;
+  pool.query(commentQuery, (err, results) => {
+    console.log(results.rows);
+    res.redirect(301, `/note/${results.rows[0].notes_id}/comments-all`);
+  });
+};
+
+const deleteComment = (req, res) => {
+  const { id } = req.params;
+  const deleteQuery = `DELETE FROM comments WHERE id=${id}`;
+  pool.query(deleteQuery, (deleteQueryError, deleteQueryResult) => {
+    if (deleteQueryError) {
+      console.log('Error executing query', deleteQueryError.stack);
+      res.status(503).send(deleteQueryResult.rows);
+      return;
+    }
+    res.redirect(301, `/note/${id}/comments-all`);
+  });
+};
+
 app.get('/signup', signUp);
 app.post('/signup', postSignUp);
 app.get('/login', loginPage);
@@ -412,5 +618,13 @@ app.get('/species/:id', getSpeciesById);
 app.get('/species/:id/edit', editSpecies);
 app.put('/species/:id/edit', editSpeciesPut);
 app.delete('/species/:id/delete', deleteSpecies);
+app.get('/behaviours', getBehaviours);
+app.get('/behaviours/:behaviour', getBehavioursByID);
+app.get('/note/:id/comments', commentsForm);
+app.get('/note/:id/comments-all', getComments);
+app.post('/note/:id/comments', postComments);
+app.get('/note/:id/comments/edit', editComment);
+app.put('/note/:id/comments/edit', editcommentPut);
+app.delete('/note/:id/comments/delete', deleteComment);
 
 app.listen(port, console.log(`Running on port ${port}!`));

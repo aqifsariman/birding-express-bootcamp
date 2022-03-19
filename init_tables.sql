@@ -1,5 +1,25 @@
-CREATE TABLE species (
- id SERIAL PRIMARY KEY,
- name TEXT,
- scientific_name TEXT
-);
+INSERT INTO behaviours (name) VALUES ('Walking');
+INSERT INTO behaviours (name) VALUES ('Resting');
+INSERT INTO behaviours (name) VALUES ('Gathering Nesting Materials');
+INSERT INTO behaviours (name) VALUES ('Mobbing');
+INSERT INTO behaviours (name) VALUES ('Long Song (Singing 3 or more songs)');
+INSERT INTO behaviours (name) VALUES ('Bathing');
+INSERT INTO behaviours (name) VALUES ('Preening');
+INSERT INTO behaviours (name) VALUES ('Territory Defense');
+INSERT INTO behaviours (name) VALUES ('Low Flying');
+INSERT INTO behaviours (name) VALUES ('Climbing Tree');
+INSERT INTO behaviours (name) VALUES ('Bark Feeding');
+INSERT INTO behaviours (name) VALUES ('Hunting');
+INSERT INTO behaviours (name) VALUES ('Flying');
+INSERT INTO behaviours (name) VALUES ('Ground Feeding');
+INSERT INTO behaviours (name) VALUES ('Feeder Feeding');
+INSERT INTO behaviours (name) VALUES ('Soaring');
+INSERT INTO behaviours (name) VALUES ('Scavenging Food');
+INSERT INTO behaviours (name) VALUES ('Pecking');
+INSERT INTO behaviours (name) VALUES ('Drinking');
+INSERT INTO behaviours (name) VALUES ('Perched');
+INSERT INTO behaviours (name) VALUES ('Flocking');
+INSERT INTO behaviours (name) VALUES ('Hovering');
+INSERT INTO behaviours (name) VALUES ('Caring For Young');
+INSERT INTO behaviours (name) VALUES ('Pooping');
+INSERT INTO behaviours (name) VALUES ('Nest');

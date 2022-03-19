@@ -16,14 +16,13 @@
       Looks good!
     </div>
   </div>
-  <div class="col-md-4">
+  <div class="col-md-3">
     <label for="behaviour" class="form-label text-light">Behaviour</label>
-    <div class="input-group has-validation">
-      <input type="text" class="form-control" id="behaviour" aria-describedby="inputGroupPrepend" name="behaviour" placeholder="Behaviour" required>
-      <div class="invalid-feedback">
-        Please input valid data.
-      </div>
-    </div>
+    <select class="form-control" id="behaviour" name="behaviour" multiple required>
+      <% behaviourResults.forEach((behaviour) =>{ %>
+      <option value="<%= behaviour.name %>"><%= behaviour.name %></option>
+     <% }); %>
+    </select>
   </div>
   <div class="col-md-6">
     <label for="vocalisations" class="form-label text-light">Vocalisations</label>
@@ -77,12 +76,12 @@
         form.classList.add('was-validated')
       }, false)
     })
-})()</script>
+})();
 
-<script>
 var dateTime = document.getElementById("date").value;
 var today = new Date().toISOString().split('T')[0];
 document.getElementById("dateTime").setAttribute('max', today);
+
 </script>
 
 

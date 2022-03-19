@@ -1,0 +1,31 @@
+<%- include('header') -%>
+<div class="jumbotron my-auto d-flex flex-column flex-sm-wrap align-items-center justify-content-center" style="height:100vh; width:100vw">
+    <table class="table table-striped table-light mt-5 table-hover col-sm-4" style="width:50vw">
+      
+      <thead>
+        <div>
+          <th scope="col" colspan="12" class="text-center text-light bg-transparent"><h1>Bird Behaviours List</h1></th>
+        </div>
+      </thead>
+      <tbody>
+         <tr class="d-flex flex-sm-wrap"></tr>
+        <% for (let i =0; i< finalResults.length;i++) {%>
+          <td class="col text-dark" ><a href="/behaviours/<%=finalResults[i].name%>"><%=finalResults[i].name %></a></td>
+          </tr>
+        <% } %>
+      </tbody>
+    </table>
+     <div class="dropdown">
+  <button class="btn btn-light dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+    Sort By
+  </button>
+  <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+    <a class="dropdown-item" href="/behaviours?sort=behaviour">Behaviour</a>
+
+  </div>
+</div>
+  </div>
+  
+
+
+<%- include('footer') -%>

@@ -1,0 +1,41 @@
+<%- include('header') -%>
+
+<div class="jumbotron my-auto d-flex align-items-center justify-content-center">
+<form class="row g-3 needs-validation" action="/note/<%=id%>/comments" method="POST" novalidate>
+  <div class="col-md-4 dateContainer">
+    <label for="comments" class="form-label text-light">Comments</label>
+    <textarea name="comments" id="comments" cols="50" rows="10" placeholder="Add comments here"></textarea>
+    <div class="valid-feedback">
+      Looks good!
+    </div>
+  </div>
+  <div class="col-12">
+    <button class="btn btn-dark" type="submit">Add Comments</button>
+  </div>
+</form>
+  </div>
+
+  <script>// Example starter JavaScript for disabling form submissions if there are invalid fields
+(function () {
+  'use strict'
+
+  // Fetch all the forms we want to apply custom Bootstrap validation styles to
+  var forms = document.querySelectorAll('.needs-validation')
+
+  // Loop over them and prevent submission
+  Array.prototype.slice.call(forms)
+    .forEach(function (form) {
+      form.addEventListener('submit', function (event) {
+        if (!form.checkValidity()) {
+          event.preventDefault()
+          event.stopPropagation()
+        }
+
+        form.classList.add('was-validated')
+      }, false)
+    })
+})();
+</script>
+
+
+<%- include('footer') -%>

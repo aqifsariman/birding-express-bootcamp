@@ -18,10 +18,6 @@
       </thead>
       <tbody>
          <tr class="d-flex flex-sm-wrap"></tr>
-         <% function capitalizeFirstLetter(str) { %>
-            <% const capitalized = str.charAt(0).toUpperCase() + str.slice(1);%>
-                <%return capitalized;%>
-          <%}%>
         <% for (let i =0; i< finalResults.length;i++) {%>
           <td class="col text-dark" ><a href="/note/<%=finalResults[i].id%>"><%=finalResults[i].date %></a></td>
           <td class="col text-dark" ><a href="/note/<%=finalResults[i].id%>"><%=finalResults[i].habitat %></a></td>
@@ -29,7 +25,7 @@
           <td class="col text-dark" ><a href="/note/<%=finalResults[i].id%>"><%=finalResults[i].behaviour %></a></td>
           <td class="col text-dark" ><a href="/note/<%=finalResults[i].id%>"><%=finalResults[i].vocalisations %></a></td>
           <td class="col text-dark" ><a href="/note/<%=finalResults[i].id%>"><%=finalResults[i].flock_size %></a></td>
-          <td class="col text-dark" ><%=capitalizeFirstLetter(finalResults[i].submitted_by) %></td>
+          <td class="col text-dark" ><%=finalResults[i].submitted_by %></td>
           </tr>
         <% } %>
       </tbody>
@@ -41,7 +37,6 @@
   <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
     <a class="dropdown-item" href="/getallnotes?sort=date">Date</a>
     <a class="dropdown-item" href="/getallnotes?sort=habitat">Habitat</a>
-    <a class="dropdown-item" href="/getallnotes?sort=behaviour">Behaviour</a>
     <a class="dropdown-item" href="/getallnotes?sort=flock_size">Flock Size</a>
     <a class="dropdown-item" href="/getallnotes?sort=user_submitted">User Submitted</a>
   </div>
